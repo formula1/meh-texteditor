@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <script type="text/javascript" src="./browser.build.js"></script>
+    <div id="content">
+    </div>
+    <script type="text/javascript">
+      var crunner = require('c-runner');
+      crunner(document.getElementById('content'));
+    </script>
+  </body>
+</html>

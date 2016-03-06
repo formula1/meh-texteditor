@@ -1,0 +1,13 @@
+{
+  "globals":{
+    "console": true
+  },
+  "esversion": 6,
+  "browserify": true,
+  "shadow": true,
+  "forin": true,
+  "funcscope": true,
+  "latedef": true,
+  "unused": true,
+  "undef": true
+}

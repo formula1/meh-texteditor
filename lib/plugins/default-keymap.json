@@ -1,0 +1,189 @@
+[
+  {
+    "env" : "editor",
+    "filter" : { "on" : { "expects" : "boolean", "or" : [true, false]} },
+    "save" : true,
+    "on" : { "evaluator" : "not"},
+    "inheritors" : [
+      { "filter" : { "event" : 20 }, "name" : "capslock" },
+      { "filter" : { "event" : 145 }, "name" : "scrolllock" },
+      { "filter" : { "event" : 144 }, "name" : "numlock" },
+      { "filter" : { "event" : 45 }, "name" : "insert" },
+    ]
+  },
+  {
+    "env" : "editor",
+    "filter" : {"on" : { "or" : [true, false]} },
+    "inheritors" : [
+      {
+        "save" : true,
+        "inheritors" : [
+          { "filter" : { "event" : 19 }, "name" : "pause" },
+          { "filter" : { "event" : 90 }, "name" : "os" },
+          { "filter" : { "event" : 18 }, "name" : "alt" },
+          { "filter" : { "event" : 16 }, "name" : "shift" },
+          { "filter" : { "event" : 27 }, "name" : "esc" },
+          { "filter" : { "event" : 13 }, "name" : "ctrl" },
+          {
+            "filter": { "event" : {"gte":112,"lte":123} },
+            "name" : "f-key",
+            "arguments" : [{
+              "evaluator": "mathjs",
+              "fn" : "f(x) = x - 111"
+            }]
+          }
+        ]
+      },
+      {
+        "inheritors" : [
+          { "filter" : { "event" : 8 }, "name": "backspace" },
+          { "filter" : { "event" : 46 }, "name": "delete" },
+          { "filter" : { "event" : 35 }, "name" : "end" },
+          { "filter" : { "event" : 36 }, "name" : "home" },
+          { "filter" : { "event" : 33 }, "name": "pageup" },
+          { "filter" : { "event" : 34 }, "name": "pagedown" },
+          { "filter" : { "event" : 37 }, "name": "left" },
+          { "filter" : { "event" : 38 }, "name": "up" },
+          { "filter" : { "event" : 39 }, "name": "right" },
+          { "filter" : { "event" : 40 }, "name": "down" },
+
+          { "filter" : { "event" : 9 }, "name": "tab" },
+          {
+            "filter" : { "event" : {"expects": "number", "gte":48,"lte":57} },
+            "name" : "number",
+            "arguments": [
+              {
+                "evaluator": "mathjs",
+                "fn" : "f(x) = x - 48"
+              }
+            ]
+          },
+          {
+            "filter" : { "event" : {"expects": "number", "gte":96,"lte":105} },
+            "name" : "raw_number",
+            "arguments": [
+              {
+                "evaluator": "mathjs",
+                "fn" : "f(x) = x - 96"
+              }
+            ]
+          },
+          {
+            "filter" : {"event" : {"expects": "number"}},
+            "arguments": [ { "evaluator": "charcode" } ],
+            "inheritors" : [
+              {"name" : "raw_alphabet", "filter" : {"event" : {"gte":65,"lte":90}} },
+              {"name" : "raw_special", "filter" : {"event" : {"gte":186,"lte":192}} },
+              {"name" : "raw_special", "filter" : {"event" : {"gte":219,"lte":222}} },
+              {"name" : "special", "filter" : {"event" : {"or":[106,107,109,111]}} }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "env" : "all",
+    "priority" : 101,
+    "filter" : {
+      "on" : { "expects" : "boolean", "or" : [true, false]},
+      "event" : { "expects" : "string", "or" : ["raw_number", "raw_alphabet", "raw_special"] }
+    },
+    "name" : {
+      "evaluator" : "arguments",
+      "which" : 0
+    },
+    "save" : true
+  },
+  {
+    "env" : "editor",
+    "priority" : 100,
+    "capture" : true,
+    "inheritors" : [
+      {
+        "filter" : {
+          "on" : { "expects" : "boolean", "or" : [true, false]},
+          "event" : { "expects" : "string", "or" : ["raw_number", "raw_alphabet", "raw_special"] }
+        },
+        "name" : {
+          "evaluator" : "arguments",
+          "which" : 0
+        },
+        "save" : true
+      },
+      {
+        "filter" : {
+          "event" : "raw_number",
+          "onKeys" : {"expects" : "string", "has" : "shift"}
+        },
+        "name" : "special",
+        "arguments" : [{
+          "evaluator" : "map",
+          "map" : {
+            "1" : "!",
+            "2" : "@",
+            "3" : "#",
+            "4" : "$",
+            "5" : "%",
+            "6" : "^",
+            "7" : "&",
+            "8" : "*",
+            "9" : "(",
+            "0" : ")"
+          }
+        }]
+      },
+      {
+        "filter" : {
+          "event" : "raw_alphabet"
+        },
+        "name" : "alphabet",
+        "inheritors" : [
+          {
+            "filter" : {
+              "not" : [
+                { "onKeys" : { "intersects" :["shift","capslock"] } },
+              ]
+            },
+            "arguments" : [{
+              "evaluator" : "method",
+              "method" : "toLowerCase"
+            }]
+          },
+          {
+            "filter" : {
+              "onKeys" : { "intersects" :["shift","capslock"] }
+            },
+            "arguments" : [{
+              "evaluator" : "method",
+              "method" : "toUpperCase"
+            }]
+          }
+        ]
+      },
+      {
+        "filter" : {
+          "event" : "raw_special",
+          "onKeys" : {"expects" : "string", "has" : "shift"}
+        },
+        "name" : "special",
+        "arguments" : [{
+          "evaluator" : "map",
+          "map" : {
+            "`" : "~",
+            "-" : "_",
+            "=" : "+",
+            "[" : "{",
+            "]" : "}",
+            "\\" : "|",
+            ";" : ":",
+            "'" : "\"",
+            "," : "<",
+            "." : ">",
+            "/" : "?"
+          }
+        }]
+      }
+    ]
+  }
+]
